@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام متابعة الساعات اليومية</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-400: rgba(45, 166, 178, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-400: rgba(230, 129, 97, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            --color-slate-900-rgb: 19, 52, 59;
+            --color-slate-500-rgb: 98, 108, 113;
+            --color-red-500-rgb: 192, 21, 47;
+            --color-orange-500-rgb: 168, 75, 47;
+
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-primary-active: var(--color-teal-700);
+            --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-error: var(--color-red-500);
+            --color-success: var(--color-teal-500);
+            --color-warning: var(--color-orange-500);
+            --color-btn-primary-text: var(--color-cream-50);
+
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-gray-400-rgb: 119, 124, 124;
+                --color-teal-300-rgb: 50, 184, 198;
+                --color-gray-300-rgb: 167, 169, 169;
+                --color-gray-200-rgb: 245, 245, 245;
+
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+                --color-primary: var(--color-teal-300);
+                --color-primary-hover: var(--color-teal-400);
+                --color-secondary: rgba(var(--color-gray-400-rgb), 0.15);
+                --color-secondary-hover: rgba(var(--color-gray-400-rgb), 0.25);
+                --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+                --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+                --color-error: var(--color-red-400);
+                --color-success: var(--color-teal-300);
+                --color-warning: var(--color-orange-400);
+                --color-btn-primary-text: var(--color-slate-900);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background-color: var(--color-background);
+            color: var(--color-text);
+            padding: var(--space-20);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: var(--space-24);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: var(--space-8);
+        }
+
+        .subtitle {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: var(--space-8);
+            margin-bottom: var(--space-24);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: var(--space-12) var(--space-20);
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-btn:hover {
+            color: var(--color-text);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            margin-bottom: var(--space-16);
+            box-shadow: var(--shadow-md);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-16);
+            margin-bottom: var(--space-16);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text);
+            margin-bottom: var(--space-8);
+        }
+
+        input, select, textarea {
+            padding: var(--space-12);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            background: var(--color-surface);
+            color: var(--color-text);
+            font-size: 14px;
+            font-family: var(--font-family-base);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .btn {
+            padding: var(--space-12) var(--space-20);
+            border: none;
+            border-radius: var(--radius-base);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-secondary {
+            background: var(--color-secondary);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-secondary-hover);
+        }
+
+        .btn-delete {
+            background: var(--color-error);
+            color: white;
+            padding: var(--space-8) var(--space-12);
+            font-size: 13px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-16);
+            margin-bottom: var(--space-24);
+        }
+
+        .stat-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: var(--space-8);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: var(--space-12);
+            text-align: right;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        th {
+            background: var(--color-secondary);
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--color-text);
+        }
+
+        td {
+            font-size: 14px;
+            color: var(--color-text);
+        }
+
+        tr:hover {
+            background: var(--color-secondary);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(var(--color-teal-500-rgb), 0.15);
+            color: var(--color-success);
+        }
+
+        .status-completed {
+            background: rgba(var(--color-slate-500-rgb), 0.15);
+            color: var(--color-text-secondary);
+        }
+
+        .ai-insights {
+            background: linear-gradient(135deg, rgba(var(--color-teal-500-rgb), 0.1), rgba(var(--color-teal-500-rgb), 0.05));
+            border: 1px solid var(--color-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            margin-bottom: var(--space-24);
+        }
+
+        .ai-insights h3 {
+            color: var(--color-primary);
+            margin-bottom: var(--space-12);
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+            font-size: 16px;
+        }
+
+        .insight-item {
+            padding: var(--space-12);
+            background: var(--color-surface);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-8);
+            font-size: 14px;
+        }
+
+        .actions {
+            display: flex;
+            gap: var(--space-8);
+            justify-content: flex-start;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--color-text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>نظام متابعة ساعات العمل اليومية</h1>
+            <p class="subtitle">تتبع دقيق لساعات العمالة والمعدات مع تحليلات الذكاء الاصطناعي</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('workers')">العمالة</button>
+            <button class="tab-btn" onclick="switchTab('equipment')">المعدات</button>
+            <button class="tab-btn" onclick="switchTab('reports')">التقارير والتحليلات</button>
+            <button class="tab-btn" onclick="switchTab('masters')" id="masters-tab-btn" style="display: none;">⚙️ البيانات الرئيسية</button>
+            <button class="btn btn-secondary" onclick="toggleAdminLogin()" style="margin-right: auto; padding: 8px 16px;">
+                <span id="admin-status">🔒 دخول المدير</span>
+            </button>
+        </div>
+
+        <div id="admin-login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+            <div class="card" style="max-width: 400px; margin: 20px;">
+                <h3 style="margin-bottom: 16px;">دخول المدير</h3>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="admin-password" placeholder="أدخل كلمة المرور">
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 16px;">
+                    <button class="btn btn-primary" onclick="verifyAdminPassword()">دخول</button>
+                    <button class="btn btn-secondary" onclick="toggleAdminLogin()">إلغاء</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="masters-tab" class="tab-content">
+            <div class="card">
+                <h2 style="margin-bottom: 16px;">قائمة الموظفين الرئيسية</h2>
+                <div style="margin-bottom: 16px;">
+                    <input type="file" id="employee-excel-upload" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleEmployeeExcelUpload(event)">
+                    <button class="btn btn-secondary" onclick="document.getElementById('employee-excel-upload').click()">
+                        📂 رفع ملف Excel للموظفين
+                    </button>
+                    <span style="font-size: 12px; color: var(--color-text-secondary); margin-right: 12px;">
+                        الأعمدة المطلوبة: اسم الموظف، المسمى الوظيفي، معدل الأجر (ريال/ساعة)، الكود الوظيفي (اختياري)
+                    </span>
+                </div>
+                <form id="employee-master-form" class="form-grid">
+                    <div class="form-group">
+                        <label>اسم الموظف *</label>
+                        <input type="text" id="emp-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>المسمى الوظيفي *</label>
+                        <input type="text" id="emp-job" required placeholder="أدخل المسمى الوظيفي">
+                    </div>
+                    <div class="form-group">
+                        <label>معدل الأجر (ريال/ساعة) *</label>
+                        <input type="number" id="emp-rate" min="0" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الكود الوظيفي</label>
+                        <input type="text" id="emp-id">
+                    </div>
+                </form>
+                <div style="margin-top: 16px;">
+                    <button class="btn btn-primary" onclick="addEmployeeMaster()">إضافة موظف</button>
+                </div>
+                <div class="table-container" style="margin-top: 24px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الإجراءات</th>
+                                <th>الكود الوظيفي</th>
+                                <th>الأجر/ساعة</th>
+                                <th>الوظيفة</th>
+                                <th>الاسم</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employees-master-tbody">
+                            <tr>
+                                <td colspan="5" class="empty-state">لا توجد بيانات. ابدأ بإضافة موظف</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 16px;">قائمة المعدات الرئيسية</h2>
+                <div style="margin-bottom: 16px;">
+                    <input type="file" id="equipment-excel-upload" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleEquipmentExcelUpload(event)">
+                    <button class="btn btn-secondary" onclick="document.getElementById('equipment-excel-upload').click()">
+                        📂 رفع ملف Excel للمعدات
+                    </button>
+                    <span style="font-size: 12px; color: var(--color-text-secondary); margin-right: 12px;">
+                        الأعمدة المطلوبة: رقم المعدة، نوع المعدة، تكلفة التشغيل (ريال/ساعة)
+                    </span>
+                </div>
+                <form id="equipment-master-form" class="form-grid">
+                    <div class="form-group">
+                        <label>رقم المعدة *</label>
+                        <input type="text" id="eq-number" required placeholder="رقم تعريف المعدة">
+                    </div>
+                    <div class="form-group">
+                        <label>نوع المعدة *</label>
+                        <input type="text" id="eq-type" required placeholder="حفارة، رافعة، خلاطة، إلخ">
+                    </div>
+                    <div class="form-group">
+                        <label>تكلفة التشغيل (ريال/ساعة) *</label>
+                        <input type="number" id="eq-cost" min="0" step="0.1" required>
+                    </div>
+                </form>
+                <div style="margin-top: 16px;">
+                    <button class="btn btn-primary" onclick="addEquipmentMaster()">إضافة معدة</button>
+                </div>
+                <div class="table-container" style="margin-top: 24px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الإجراءات</th>
+                                <th>التكلفة/ساعة</th>
+                                <th>النوع</th>
+                                <th>رقم المعدة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipment-master-tbody">
+                            <tr>
+                                <td colspan="5" class="empty-state">لا توجد بيانات. ابدأ بإضافة معدة</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 16px;">قائمة المهندسين المسؤولين</h2>
+                <div style="margin-bottom: 16px;">
+                    <input type="file" id="engineer-excel-upload" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleEngineerExcelUpload(event)">
+                    <button class="btn btn-secondary" onclick="document.getElementById('engineer-excel-upload').click()">
+                        📂 رفع ملف Excel للمهندسين
+                    </button>
+                    <span style="font-size: 12px; color: var(--color-text-secondary); margin-right: 12px;">
+                        الأعمدة المطلوبة: اسم المهندس، الكود الوظيفي (اختياري)، التخصص
+                    </span>
+                </div>
+                <form id="engineer-master-form" class="form-grid">
+                    <div class="form-group">
+                        <label>اسم المهندس *</label>
+                        <input type="text" id="eng-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الكود الوظيفي</label>
+                        <input type="text" id="eng-id" placeholder="الكود الوظيفي للمهندس">
+                    </div>
+                    <div class="form-group">
+                        <label>التخصص *</label>
+                        <input type="text" id="eng-specialty" required placeholder="أدخل التخصص">
+                    </div>
+                </form>
+                <div style="margin-top: 16px;">
+                    <button class="btn btn-primary" onclick="addEngineerMaster()">إضافة مهندس</button>
+                </div>
+                <div class="table-container" style="margin-top: 24px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الإجراءات</th>
+                                <th>التخصص</th>
+                                <th>الكود الوظيفي</th>
+                                <th>الاسم</th>
+                            </tr>
+                        </thead>
+                        <tbody id="engineers-master-tbody">
+                            <tr>
+                                <td colspan="5" class="empty-state">لا توجد بيانات. ابدأ بإضافة مهندس</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="workers-tab" class="tab-content active">
+            <div class="card">
+                <h2 style="margin-bottom: 16px;">تسجيل ساعات عمل العمالة</h2>
+                <form id="worker-form" class="form-grid">
+                    <div class="form-group">
+                        <label>اسم العامل *</label>
+                        <select id="worker-name" required onchange="updateWorkerRate()">
+                            <option value="">اختر من القائمة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المسمى الوظيفي</label>
+                        <input type="text" id="worker-job" readonly style="background: var(--color-secondary);">
+                    </div>
+                    <div class="form-group">
+                        <label>التاريخ *</label>
+                        <input type="date" id="worker-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ساعات العمل *</label>
+                        <input type="number" id="worker-hours" min="0" max="24" step="0.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الشبكة *</label>
+                        <select id="worker-network" required>
+                            <option value="">اختر الشبكة</option>
+                            <option value="سيول">سيول</option>
+                            <option value="مياه">مياه</option>
+                            <option value="هاتف">هاتف</option>
+                            <option value="جهد متوسط">جهد متوسط</option>
+                            <option value="جهد منخفض">جهد منخفض</option>
+                            <option value="أرصفة">أرصفة</option>
+                            <option value="إنشاءات">إنشاءات</option>
+                            <option value="لوجيستيكس">لوجيستيكس</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المشروع *</label>
+                        <select id="worker-project" required>
+                            <option value="">اختر المشروع</option>
+                            <option value="مرسيه1">مرسيه1</option>
+                            <option value="مرسيه2">مرسيه2</option>
+                            <option value="أرض النظيم">أرض النظيم</option>
+                            <option value="العامرية1">العامرية1</option>
+                            <option value="العامرية2">العامرية2</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المنطقة *</label>
+                        <select id="worker-region" required>
+                            <option value="">اختر المنطقة</option>
+                            <option value="الرياض">الرياض</option>
+                            <option value="جدة">جدة</option>
+                            <option value="الدمام">الدمام</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="worker-rate">
+                    <div class="form-group">
+                        <label>المهندس المسؤول *</label>
+                        <select id="worker-engineer" required>
+                            <option value="">اختر المهندس</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ملاحظات</label>
+                        <input type="text" id="worker-notes" placeholder="أي ملاحظات إضافية">
+                    </div>
+                </form>
+                <div style="margin-top: 16px;">
+                    <button class="btn btn-primary" onclick="addWorkerRecord()">إضافة السجل</button>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div class="stats-grid" style="flex: 1; margin-bottom: 0;">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-workers">0</div>
+                        <div class="stat-label">إجمالي العمال</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-worker-hours">0</div>
+                        <div class="stat-label">إجمالي الساعات</div>
+                    </div>
+                    <div class="stat-card" id="worker-cost-stat" style="display: none;">
+                        <div class="stat-value" id="total-worker-cost">0</div>
+                        <div class="stat-label">إجمالي التكلفة (ريال)</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="exportWorkersToExcel()" style="margin-right: 16px;">
+                    📊 تصدير Excel
+                </button>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 16px;">سجلات العمالة</h3>
+                <div class="table-container">
+                    <table id="workers-table">
+                        <thead>
+                            <tr>
+                                <th>الإجراءات</th>
+                                <th>ملاحظات</th>
+                                <th>المهندس</th>
+                                <th class="admin-only" style="display: none;">التكلفة</th>
+                                <th class="admin-only" style="display: none;">الأجر/ساعة</th>
+                                <th>المنطقة</th>
+                                <th>المشروع</th>
+                                <th>الشبكة</th>
+                                <th>الساعات</th>
+                                <th>التاريخ</th>
+                                <th>الوظيفة</th>
+                                <th>الاسم</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workers-tbody">
+                            <tr>
+                                <td colspan="10" class="empty-state">لا توجد سجلات بعد. ابدأ بإضافة سجل جديد</td>
+                            </tr>
+                        </tbody>
+                        <tbody id="workers-tbody">
+                            <tr>
+                                <td colspan="8" class="empty-state">لا توجد سجلات بعد. ابدأ بإضافة سجل جديد</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="equipment-tab" class="tab-content">
+            <div class="card">
+                <h2 style="margin-bottom: 16px;">تسجيل ساعات عمل المعدات</h2>
+                <form id="equipment-form" class="form-grid">
+                    <div class="form-group">
+                        <label>اسم المعدة *</label>
+                        <select id="equipment-name" required onchange="updateEquipmentCost()">
+                            <option value="">اختر من القائمة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>نوع المعدة</label>
+                        <input type="text" id="equipment-type" readonly style="background: var(--color-secondary);">
+                    </div>
+                    <div class="form-group">
+                        <label>التاريخ *</label>
+                        <input type="date" id="equipment-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ساعات التشغيل *</label>
+                        <input type="number" id="equipment-hours" min="0" max="24" step="0.5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الشبكة *</label>
+                        <select id="equipment-network" required>
+                            <option value="">اختر الشبكة</option>
+                            <option value="سيول">سيول</option>
+                            <option value="مياه">مياه</option>
+                            <option value="هاتف">هاتف</option>
+                            <option value="جهد متوسط">جهد متوسط</option>
+                            <option value="جهد منخفض">جهد منخفض</option>
+                            <option value="أرصفة">أرصفة</option>
+                            <option value="إنشاءات">إنشاءات</option>
+                            <option value="لوجيستيكس">لوجيستيكس</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المشروع *</label>
+                        <select id="equipment-project" required>
+                            <option value="">اختر المشروع</option>
+                            <option value="مرسيه1">مرسيه1</option>
+                            <option value="مرسيه2">مرسيه2</option>
+                            <option value="أرض النظيم">أرض النظيم</option>
+                            <option value="العامرية1">العامرية1</option>
+                            <option value="العامرية2">العامرية2</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المنطقة *</label>
+                        <select id="equipment-region" required>
+                            <option value="">اختر المنطقة</option>
+                            <option value="الرياض">الرياض</option>
+                            <option value="جدة">جدة</option>
+                            <option value="الدمام">الدمام</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="equipment-cost">
+                    <div class="form-group">
+                        <label>المهندس المسؤول *</label>
+                        <select id="equipment-engineer" required>
+                            <option value="">اختر المهندس</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ملاحظات</label>
+                        <input type="text" id="equipment-notes" placeholder="أي ملاحظات إضافية">
+                    </div>
+                    <div class="form-group">
+                        <label>اسم المشغل</label>
+                        <input type="text" id="equipment-operator">
+                    </div>
+                    <div class="form-group">
+                        <label>الحالة *</label>
+                        <select id="equipment-status" required>
+                            <option value="عاملة">عاملة</option>
+                            <option value="صيانة">صيانة</option>
+                            <option value="عطل">عطل</option>
+                        </select>
+                    </div>
+                </form>
+                <div style="margin-top: 16px;">
+                    <button class="btn btn-primary" onclick="addEquipmentRecord()">إضافة السجل</button>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div class="stats-grid" style="flex: 1; margin-bottom: 0;">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-equipment">0</div>
+                        <div class="stat-label">إجمالي المعدات</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-equipment-hours">0</div>
+                        <div class="stat-label">إجمالي ساعات التشغيل</div>
+                    </div>
+                    <div class="stat-card" id="equipment-cost-stat" style="display: none;">
+                        <div class="stat-value" id="total-equipment-cost">0</div>
+                        <div class="stat-label">إجمالي التكلفة (ريال)</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="exportEquipmentToExcel()" style="margin-right: 16px;">
+                    📊 تصدير Excel
+                </button>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 16px;">سجلات المعدات</h3>
+                <div class="table-container">
+                    <table id="equipment-table">
+                        <thead>
+                            <tr>
+                                <th>الإجراءات</th>
+                                <th>ملاحظات</th>
+                                <th>المهندس</th>
+                                <th>الحالة</th>
+                                <th>المشغل</th>
+                                <th class="admin-only" style="display: none;">التكلفة</th>
+                                <th class="admin-only" style="display: none;">التكلفة/ساعة</th>
+                                <th>المنطقة</th>
+                                <th>المشروع</th>
+                                <th>الشبكة</th>
+                                <th>الساعات</th>
+                                <th>التاريخ</th>
+                                <th>النوع</th>
+                                <th>اسم المعدة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipment-tbody">
+                            <tr>
+                                <td colspan="12" class="empty-state">لا توجد سجلات بعد. ابدأ بإضافة سجل جديد</td>
+                            </tr>
+                        </tbody>
+                        <tbody id="equipment-tbody">
+                            <tr>
+                                <td colspan="10" class="empty-state">لا توجد سجلات بعد. ابدأ بإضافة سجل جديد</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="reports-tab" class="tab-content">
+            <div class="ai-insights">
+                <h3>
+                    <span>🤖</span>
+                    تحليلات الذكاء الاصطناعي
+                </h3>
+                <div id="ai-insights-content"></div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-worker-hours">0</div>
+                    <div class="stat-label">متوسط ساعات العمل اليومية</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-equipment-utilization">0%</div>
+                    <div class="stat-label">معدل استخدام المعدات</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-project-cost">0</div>
+                    <div class="stat-label">إجمالي تكلفة المشروع (ريال)</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 16px;">تقرير تفصيلي حسب المهندس والشبكة</h3>
+                <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>المهندس</label>
+                        <select id="filter-engineer" onchange="updateFilteredReports()">
+                            <option value="">جميع المهندسين</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>الشبكة</label>
+                        <select id="filter-network" onchange="updateFilteredReports()">
+                            <option value="">جميع الشبكات</option>
+                            <option value="سيول">سيول</option>
+                            <option value="مياه">مياه</option>
+                            <option value="هاتف">هاتف</option>
+                            <option value="جهد متوسط">جهد متوسط</option>
+                            <option value="جهد منخفض">جهد منخفض</option>
+                            <option value="أرصفة">أرصفة</option>
+                            <option value="إنشاءات">إنشاءات</option>
+                            <option value="لوجيستيكس">لوجيستيكس</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>المشروع</label>
+                        <select id="filter-project" onchange="updateFilteredReports()">
+                            <option value="">جميع المشاريع</option>
+                            <option value="مرسيه1">مرسيه1</option>
+                            <option value="مرسيه2">مرسيه2</option>
+                            <option value="أرض النظيم">أرض النظيم</option>
+                            <option value="العامرية1">العامرية1</option>
+                            <option value="العامرية2">العامرية2</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="engineers-report-table">
+                        <thead>
+                            <tr>
+                                <th>إجمالي التكلفة</th>
+                                <th>تكلفة المعدات</th>
+                                <th>تكلفة العمالة</th>
+                                <th>عدد المعدات</th>
+                                <th>عدد العمال</th>
+                                <th>اسم المهندس</th>
+                            </tr>
+                        </thead>
+                        <tbody id="engineers-report-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 16px;">تقرير أداء العمال حسب الشبكة</h3>
+                <div class="table-container">
+                    <table id="workers-performance-table">
+                        <thead>
+                            <tr>
+                                <th>كفاءة الأداء</th>
+                                <th>متوسط الساعات/يوم</th>
+                                <th>إجمالي الساعات</th>
+                                <th>الشبكة</th>
+                                <th>المشروع</th>
+                                <th>المهندس المسؤول</th>
+                                <th>اسم العامل</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workers-performance-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 16px;">تقرير أداء المعدات حسب الشبكة</h3>
+                <div class="table-container">
+                    <table id="equipment-performance-table">
+                        <thead>
+                            <tr>
+                                <th>كفاءة الأداء</th>
+                                <th>متوسط الساعات/يوم</th>
+                                <th>إجمالي الساعات</th>
+                                <th>الشبكة</th>
+                                <th>المشروع</th>
+                                <th>المهندس المسؤول</th>
+                                <th>اسم المعدة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipment-performance-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 16px;">تقرير حسب الشبكة/الموقع</h3>
+                <div class="table-container">
+                    <table id="projects-table">
+                        <thead>
+                            <tr>
+                                <th>إجمالي التكلفة</th>
+                                <th>تكلفة المعدات</th>
+                                <th>تكلفة العمالة</th>
+                                <th>ساعات المعدات</th>
+                                <th>ساعات العمالة</th>
+                                <th>المشروع/الموقع</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projects-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-bottom: 16px;">توصيات التحسين</h3>
+                <div id="recommendations"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let workerRecords = [];
+        let equipmentRecords = [];
+        let employeesMaster = [];
+        let equipmentMaster = [];
+        let engineersMaster = [];
+        let isAdminMode = false;
+        const ADMIN_PASSWORD = 'admin123';
+
+        function toggleAdminLogin() {
+            const modal = document.getElementById('admin-login-modal');
+            modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+            document.getElementById('admin-password').value = '';
+        }
+
+        function verifyAdminPassword() {
+            const password = document.getElementById('admin-password').value;
+            if (password === ADMIN_PASSWORD) {
+                isAdminMode = true;
+                toggleAdminLogin();
+                updateAdminView();
+                alert('تم تسجيل الدخول بنجاح كمدير');
+            } else {
+                alert('كلمة المرور غير صحيحة');
+            }
+        }
+
+        function updateAdminView() {
+            document.querySelectorAll('.admin-only').forEach(el => {
+                el.style.display = isAdminMode ? '' : 'none';
+            });
+            
+            document.getElementById('masters-tab-btn').style.display = isAdminMode ? '' : 'none';
+            document.getElementById('worker-cost-stat').style.display = isAdminMode ? '' : 'none';
+            document.getElementById('equipment-cost-stat').style.display = isAdminMode ? '' : 'none';
+            
+            document.getElementById('admin-status').textContent = isAdminMode ? '🔓 وضع المدير' : '🔒 دخول المدير';
+            
+            updateWorkerTable();
+            updateEquipmentTable();
+        }
+
+        function switchTab(tab) {
+            if (tab === 'masters' && !isAdminMode) {
+                alert('يجب تسجيل الدخول كمدير للوصول إلى البيانات الرئيسية');
+                return;
+            }
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+            
+            if (tab === 'reports') {
+                updateReports();
+            }
+        }
+
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('worker-date').value = today;
+            document.getElementById('equipment-date').value = today;
+        }
+
+        function addEmployeeMaster() {
+            const name = document.getElementById('emp-name').value;
+            const job = document.getElementById('emp-job').value;
+            const rate = parseFloat(document.getElementById('emp-rate').value);
+            const empId = document.getElementById('emp-id').value;
+
+            if (!name || !job || !rate) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            employeesMaster.push({ id: Date.now(), name, job, rate, empId });
+            document.getElementById('employee-master-form').reset();
+            updateEmployeesMasterTable();
+            updateWorkerNameDropdown();
+        }
+
+        function addEquipmentMaster() {
+            const number = document.getElementById('eq-number').value;
+            const type = document.getElementById('eq-type').value;
+            const cost = parseFloat(document.getElementById('eq-cost').value);
+
+            if (!number || !type || !cost) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            equipmentMaster.push({ id: Date.now(), name: number, type, cost });
+            document.getElementById('equipment-master-form').reset();
+            updateEquipmentMasterTable();
+            updateEquipmentNameDropdown();
+        }
+
+        function addEngineerMaster() {
+            const name = document.getElementById('eng-name').value;
+            const engId = document.getElementById('eng-id').value;
+            const specialty = document.getElementById('eng-specialty').value;
+
+            if (!name || !specialty) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            engineersMaster.push({ id: Date.now(), name, engId, specialty });
+            document.getElementById('engineer-master-form').reset();
+            updateEngineersMasterTable();
+            updateEngineersDropdowns();
+        }
+
+        function deleteEmployeeMaster(id) {
+            if (confirm('هل أنت متأكد من حذف هذا الموظف؟')) {
+                employeesMaster = employeesMaster.filter(e => e.id !== id);
+                updateEmployeesMasterTable();
+                updateWorkerNameDropdown();
+            }
+        }
+
+        function deleteEquipmentMasterItem(id) {
+            if (confirm('هل أنت متأكد من حذف هذه المعدة؟')) {
+                equipmentMaster = equipmentMaster.filter(e => e.id !== id);
+                updateEquipmentMasterTable();
+                updateEquipmentNameDropdown();
+            }
+        }
+
+        function deleteEngineerMaster(id) {
+            if (confirm('هل أنت متأكد من حذف هذا المهندس؟')) {
+                engineersMaster = engineersMaster.filter(e => e.id !== id);
+                updateEngineersMasterTable();
+                updateEngineersDropdowns();
+            }
+        }
+
+        function updateEmployeesMasterTable() {
+            const tbody = document.getElementById('employees-master-tbody');
+            if (employeesMaster.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">لا توجد بيانات. ابدأ بإضافة موظف</td></tr>';
+                return;
+            }
+            tbody.innerHTML = employeesMaster.map(emp => `
+                <tr>
+                    <td>
+                        <button class="btn btn-secondary" onclick="editEmployeeMaster(${emp.id})" style="margin-left: 4px;">تعديل</button>
+                        <button class="btn btn-delete" onclick="deleteEmployeeMaster(${emp.id})">حذف</button>
+                    </td>
+                    <td>${emp.empId || '-'}</td>
+                    <td>${emp.rate.toFixed(2)}</td>
+                    <td>${emp.job}</td>
+                    <td>${emp.name}</td>
+                </tr>
+            `).join('');
+        }
+
+        function editEmployeeMaster(id) {
+            const employee = employeesMaster.find(e => e.id === id);
+            if (!employee) return;
+            
+            document.getElementById('emp-name').value = employee.name;
+            document.getElementById('emp-job').value = employee.job;
+            document.getElementById('emp-rate').value = employee.rate;
+            document.getElementById('emp-id').value = employee.empId || '';
+            
+            deleteEmployeeMaster(id);
+            
+            document.getElementById('emp-name').focus();
+        }
+
+        function updateEquipmentMasterTable() {
+            const tbody = document.getElementById('equipment-master-tbody');
+            if (equipmentMaster.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">لا توجد بيانات. ابدأ بإضافة معدة</td></tr>';
+                return;
+            }
+            tbody.innerHTML = equipmentMaster.map(eq => `
+                <tr>
+                    <td>
+                        <button class="btn btn-secondary" onclick="editEquipmentMaster(${eq.id})" style="margin-left: 4px;">تعديل</button>
+                        <button class="btn btn-delete" onclick="deleteEquipmentMasterItem(${eq.id})">حذف</button>
+                    </td>
+                    <td>${eq.cost.toFixed(2)}</td>
+                    <td>${eq.type}</td>
+                    <td><strong>${eq.name}</strong></td>
+                </tr>
+            `).join('');
+        }
+
+        function editEquipmentMaster(id) {
+            const equipment = equipmentMaster.find(e => e.id === id);
+            if (!equipment) return;
+            
+            document.getElementById('eq-number').value = equipment.name;
+            document.getElementById('eq-type').value = equipment.type;
+            document.getElementById('eq-cost').value = equipment.cost;
+            
+            deleteEquipmentMasterItem(id);
+            
+            document.getElementById('eq-number').focus();
+        }
+
+        function handleEmployeeExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const text = e.target.result;
+                    const lines = text.split('\n').filter(line => line.trim());
+                    
+                    if (lines.length < 2) {
+                        alert('الملف فارغ أو لا يحتوي على بيانات');
+                        return;
+                    }
+
+                    const headers = lines[0].split(/[,\t]/);
+                    let addedCount = 0;
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = lines[i].split(/[,\t]/);
+                        
+                        const name = values[0]?.trim();
+                        const job = values[1]?.trim();
+                        const rate = parseFloat(values[2]?.trim());
+                        const empId = values[3]?.trim() || '';
+
+                        if (name && job && !isNaN(rate) && rate > 0) {
+                            employeesMaster.push({ id: Date.now() + i, name, job, rate, empId });
+                            addedCount++;
+                        }
+                    }
+
+                    if (addedCount > 0) {
+                        updateEmployeesMasterTable();
+                        updateWorkerNameDropdown();
+                        alert(`تم إضافة ${addedCount} موظف بنجاح`);
+                    } else {
+                        alert('لم يتم العثور على بيانات صالحة في الملف');
+                    }
+                } catch (error) {
+                    alert('حدث خطأ في قراءة الملف. تأكد من صحة التنسيق');
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+            event.target.value = '';
+        }
+
+        function handleEquipmentExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const text = e.target.result;
+                    const lines = text.split('\n').filter(line => line.trim());
+                    
+                    if (lines.length < 2) {
+                        alert('الملف فارغ أو لا يحتوي على بيانات');
+                        return;
+                    }
+
+                    const headers = lines[0].split(/[,\t]/);
+                    let addedCount = 0;
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = lines[i].split(/[,\t]/);
+                        
+                        const number = values[0]?.trim();
+                        const type = values[1]?.trim();
+                        const cost = parseFloat(values[2]?.trim());
+
+                        if (number && type && !isNaN(cost) && cost > 0) {
+                            equipmentMaster.push({ id: Date.now() + i, name: number, type, cost });
+                            addedCount++;
+                        }
+                    }
+
+                    if (addedCount > 0) {
+                        updateEquipmentMasterTable();
+                        updateEquipmentNameDropdown();
+                        alert(`تم إضافة ${addedCount} معدة بنجاح`);
+                    } else {
+                        alert('لم يتم العثور على بيانات صالحة في الملف');
+                    }
+                } catch (error) {
+                    alert('حدث خطأ في قراءة الملف. تأكد من صحة التنسيق');
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+            event.target.value = '';
+        }
+
+        function handleEngineerExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const text = e.target.result;
+                    const lines = text.split('\n').filter(line => line.trim());
+                    
+                    if (lines.length < 2) {
+                        alert('الملف فارغ أو لا يحتوي على بيانات');
+                        return;
+                    }
+
+                    const headers = lines[0].split(/[,\t]/);
+                    let addedCount = 0;
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = lines[i].split(/[,\t]/);
+                        
+                        const name = values[0]?.trim();
+                        const engId = values[1]?.trim() || '';
+                        const specialty = values[2]?.trim();
+
+                        if (name && specialty) {
+                            engineersMaster.push({ id: Date.now() + i, name, engId, specialty });
+                            addedCount++;
+                        }
+                    }
+
+                    if (addedCount > 0) {
+                        updateEngineersMasterTable();
+                        updateEngineersDropdowns();
+                        alert(`تم إضافة ${addedCount} مهندس بنجاح`);
+                    } else {
+                        alert('لم يتم العثور على بيانات صالحة في الملف');
+                    }
+                } catch (error) {
+                    alert('حدث خطأ في قراءة الملف. تأكد من صحة التنسيق');
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+            event.target.value = '';
+        }
+
+        function updateEngineersMasterTable() {
+            const tbody = document.getElementById('engineers-master-tbody');
+            if (engineersMaster.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">لا توجد بيانات. ابدأ بإضافة مهندس</td></tr>';
+                return;
+            }
+            tbody.innerHTML = engineersMaster.map(eng => `
+                <tr>
+                    <td>
+                        <button class="btn btn-secondary" onclick="editEngineerMaster(${eng.id})" style="margin-left: 4px;">تعديل</button>
+                        <button class="btn btn-delete" onclick="deleteEngineerMaster(${eng.id})">حذف</button>
+                    </td>
+                    <td>${eng.specialty}</td>
+                    <td>${eng.engId || '-'}</td>
+                    <td>${eng.name}</td>
+                </tr>
+            `).join('');
+        }
+
+        function editEngineerMaster(id) {
+            const engineer = engineersMaster.find(e => e.id === id);
+            if (!engineer) return;
+            
+            document.getElementById('eng-name').value = engineer.name;
+            document.getElementById('eng-id').value = engineer.engId || '';
+            document.getElementById('eng-specialty').value = engineer.specialty;
+            
+            deleteEngineerMaster(id);
+            
+            document.getElementById('eng-name').focus();
+        }
+
+        function updateWorkerNameDropdown() {
+            const select = document.getElementById('worker-name');
+            select.innerHTML = '<option value="">اختر من القائمة</option>' + 
+                employeesMaster.map(emp => `<option value="${emp.name}" data-job="${emp.job}" data-rate="${emp.rate}">${emp.name} - ${emp.job}</option>`).join('');
+        }
+
+        function updateEquipmentNameDropdown() {
+            const select = document.getElementById('equipment-name');
+            select.innerHTML = '<option value="">اختر من القائمة</option>' + 
+                equipmentMaster.map(eq => `<option value="${eq.name}" data-type="${eq.type}" data-cost="${eq.cost}">معدة رقم ${eq.name} - ${eq.type}</option>`).join('');
+        }
+
+        function updateEngineersDropdowns() {
+            const workerSelect = document.getElementById('worker-engineer');
+            const equipmentSelect = document.getElementById('equipment-engineer');
+            const options = '<option value="">اختر المهندس</option>' + 
+                engineersMaster.map(eng => `<option value="${eng.name}">${eng.name}${eng.engId ? ' - ' + eng.engId : ''} - ${eng.specialty}</option>`).join('');
+            workerSelect.innerHTML = options;
+            equipmentSelect.innerHTML = options;
+        }
+
+        function updateWorkerRate() {
+            const select = document.getElementById('worker-name');
+            const selectedOption = select.options[select.selectedIndex];
+            if (selectedOption.value) {
+                document.getElementById('worker-job').value = selectedOption.dataset.job;
+                document.getElementById('worker-rate').value = selectedOption.dataset.rate;
+            } else {
+                document.getElementById('worker-job').value = '';
+                document.getElementById('worker-rate').value = '';
+            }
+        }
+
+        function updateEquipmentCost() {
+            const select = document.getElementById('equipment-name');
+            const selectedOption = select.options[select.selectedIndex];
+            if (selectedOption.value) {
+                document.getElementById('equipment-type').value = selectedOption.dataset.type;
+                document.getElementById('equipment-cost').value = selectedOption.dataset.cost;
+            } else {
+                document.getElementById('equipment-type').value = '';
+                document.getElementById('equipment-cost').value = '';
+            }
+        }
+
+        function addWorkerRecord() {
+            const name = document.getElementById('worker-name').value;
+            const job = document.getElementById('worker-job').value;
+            const date = document.getElementById('worker-date').value;
+            const hours = parseFloat(document.getElementById('worker-hours').value);
+            const network = document.getElementById('worker-network').value;
+            const project = document.getElementById('worker-project').value;
+            const region = document.getElementById('worker-region').value;
+            const rate = parseFloat(document.getElementById('worker-rate').value) || 0;
+            const engineer = document.getElementById('worker-engineer').value;
+            const notes = document.getElementById('worker-notes').value;
+
+            if (!name || !date || !hours || !network || !project || !region || !engineer) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            const cost = hours * rate;
+
+            workerRecords.push({
+                id: Date.now(),
+                name,
+                job,
+                date,
+                hours,
+                network,
+                project,
+                region,
+                location: `${network} - ${project} - ${region}`,
+                rate,
+                cost,
+                engineer,
+                notes
+            });
+
+            document.getElementById('worker-form').reset();
+            setDefaultDate();
+            updateWorkerTable();
+            updateWorkerStats();
+        }
+
+        function addEquipmentRecord() {
+            const name = document.getElementById('equipment-name').value;
+            const type = document.getElementById('equipment-type').value;
+            const date = document.getElementById('equipment-date').value;
+            const hours = parseFloat(document.getElementById('equipment-hours').value);
+            const network = document.getElementById('equipment-network').value;
+            const project = document.getElementById('equipment-project').value;
+            const region = document.getElementById('equipment-region').value;
+            const cost = parseFloat(document.getElementById('equipment-cost').value) || 0;
+            const operator = document.getElementById('equipment-operator').value;
+            const status = document.getElementById('equipment-status').value;
+            const engineer = document.getElementById('equipment-engineer').value;
+            const notes = document.getElementById('equipment-notes').value;
+
+            if (!name || !date || !hours || !network || !project || !region || !status || !engineer) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            const totalCost = hours * cost;
+
+            equipmentRecords.push({
+                id: Date.now(),
+                name,
+                type,
+                date,
+                hours,
+                network,
+                project,
+                region,
+                location: `${network} - ${project} - ${region}`,
+                cost,
+                operator,
+                status,
+                totalCost,
+                engineer,
+                notes
+            });
+
+            document.getElementById('equipment-form').reset();
+            setDefaultDate();
+            updateEquipmentTable();
+            updateEquipmentStats();
+        }
+
+        function deleteWorkerRecord(id) {
+            if (confirm('هل أنت متأكد من حذف هذا السجل؟')) {
+                workerRecords = workerRecords.filter(record => record.id !== id);
+                updateWorkerTable();
+                updateWorkerStats();
+            }
+        }
+
+        function deleteEquipmentRecord(id) {
+            if (confirm('هل أنت متأكد من حذف هذا السجل؟')) {
+                equipmentRecords = equipmentRecords.filter(record => record.id !== id);
+                updateEquipmentTable();
+                updateEquipmentStats();
+            }
+        }
+
+        function updateWorkerTable() {
+            const tbody = document.getElementById('workers-tbody');
+            
+            if (workerRecords.length === 0) {
+                const colspan = isAdminMode ? '12' : '10';
+                tbody.innerHTML = `<tr><td colspan="${colspan}" class="empty-state">لا توجد سجلات بعد. ابدأ بإضافة سجل جديد</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = workerRecords.map(record => `
+                <tr>
+                    <td class="actions">
+                        <button class="btn btn-delete" onclick="deleteWorkerRecord(${record.id})">حذف</button>
+                    </td>
+                    <td>${record.notes || '-'}</td>
+                    <td>${record.engineer}</td>
+                    <td class="admin-only" style="display: ${isAdminMode ? '' : 'none'};">${record.cost.toFixed(2)}</td>
+                    <td class="admin-only" style="display: ${isAdminMode ? '' : 'none'};">${record.rate.toFixed(2)}</td>
+                    <td>${record.region}</td>
+                    <td>${record.project}</td>
+                    <td>${record.network}</td>
+                    <td>${record.hours}</td>
+                    <td>${record.date}</td>
+                    <td>${record.job}</td>
+                    <td>${record.name}</td>
+                </tr>
+            `).join('');
+        }
+
+        function exportWorkersToExcel() {
+            if (workerRecords.length === 0) {
+                alert('لا توجد بيانات لتصديرها');
+                return;
+            }
+
+            let csv = 'الاسم,الوظيفة,التاريخ,الساعات,الشبكة,المشروع,المنطقة,المهندس المسؤول,ملاحظات';
+            if (isAdminMode) {
+                csv += ',الأجر/ساعة,التكلفة';
+            }
+            csv += '\n';
+
+            workerRecords.forEach(record => {
+                let row = `${record.name},${record.job},${record.date},${record.hours},${record.network},${record.project},${record.region},${record.engineer},"${record.notes || '-'}"`;
+                if (isAdminMode) {
+                    row += `,${record.rate.toFixed(2)},${record.cost.toFixed(2)}`;
+                }
+                csv += row + '\n';
+            });
+
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `سجلات_العمالة_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function updateEquipmentTable() {
+            const tbody = document.getElementById('equipment-tbody');
+            
+            if (equipmentRecords.length === 0) {
+                const colspan = isAdminMode ? '14' : '12';
+                tbody.innerHTML = `<tr><td colspan="${colspan}" class="empty-state">لا توجد سجلات بعد. ابدأ بإضافة سجل جديد</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = equipmentRecords.map(record => `
+                <tr>
+                    <td class="actions">
+                        <button class="btn btn-delete" onclick="deleteEquipmentRecord(${record.id})">حذف</button>
+                    </td>
+                    <td>${record.notes || '-'}</td>
+                    <td>${record.engineer}</td>
+                    <td><span class="status-badge ${record.status === 'عاملة' ? 'status-active' : 'status-completed'}">${record.status}</span></td>
+                    <td>${record.operator || '-'}</td>
+                    <td class="admin-only" style="display: ${isAdminMode ? '' : 'none'};">${record.totalCost.toFixed(2)}</td>
+                    <td class="admin-only" style="display: ${isAdminMode ? '' : 'none'};">${record.cost.toFixed(2)}</td>
+                    <td>${record.region}</td>
+                    <td>${record.project}</td>
+                    <td>${record.network}</td>
+                    <td>${record.hours}</td>
+                    <td>${record.date}</td>
+                    <td>${record.type}</td>
+                    <td>${record.name}</td>
+                </tr>
+            `).join('');
+        }
+
+        function exportEquipmentToExcel() {
+            if (equipmentRecords.length === 0) {
+                alert('لا توجد بيانات لتصديرها');
+                return;
+            }
+
+            let csv = 'اسم المعدة,النوع,التاريخ,الساعات,الشبكة,المشروع,المنطقة,المشغل,الحالة,المهندس المسؤول,ملاحظات';
+            if (isAdminMode) {
+                csv += ',التكلفة/ساعة,التكلفة الإجمالية';
+            }
+            csv += '\n';
+
+            equipmentRecords.forEach(record => {
+                let row = `${record.name},${record.type},${record.date},${record.hours},${record.network},${record.project},${record.region},"${record.operator || '-'}",${record.status},${record.engineer},"${record.notes || '-'}"`;
+                if (isAdminMode) {
+                    row += `,${record.cost.toFixed(2)},${record.totalCost.toFixed(2)}`;
+                }
+                csv += row + '\n';
+            });
+
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `سجلات_المعدات_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function updateWorkerStats() {
+            const uniqueWorkers = new Set(workerRecords.map(r => r.name)).size;
+            const totalHours = workerRecords.reduce((sum, r) => sum + r.hours, 0);
+            const totalCost = workerRecords.reduce((sum, r) => sum + r.cost, 0);
+
+            document.getElementById('total-workers').textContent = uniqueWorkers;
+            document.getElementById('total-worker-hours').textContent = totalHours.toFixed(1);
+            document.getElementById('total-worker-cost').textContent = totalCost.toFixed(2);
+        }
+
+        function updateEquipmentStats() {
+            const uniqueEquipment = new Set(equipmentRecords.map(r => r.name)).size;
+            const totalHours = equipmentRecords.reduce((sum, r) => sum + r.hours, 0);
+            const totalCost = equipmentRecords.reduce((sum, r) => sum + r.totalCost, 0);
+
+            document.getElementById('total-equipment').textContent = uniqueEquipment;
+            document.getElementById('total-equipment-hours').textContent = totalHours.toFixed(1);
+            document.getElementById('total-equipment-cost').textContent = totalCost.toFixed(2);
+        }
+
+        function updateReports() {
+            updateProjectsReport();
+            updateEngineersReport();
+            updateWorkersPerformanceReport();
+            updateEquipmentPerformanceReport();
+            updateEngineerFilterDropdown();
+            updateAIInsights();
+            updateRecommendations();
+            updateAdvancedStats();
+        }
+
+        function updateEngineerFilterDropdown() {
+            const select = document.getElementById('filter-engineer');
+            const currentValue = select.value;
+            const engineers = new Set();
+            
+            workerRecords.forEach(r => engineers.add(r.engineer));
+            equipmentRecords.forEach(r => engineers.add(r.engineer));
+            
+            select.innerHTML = '<option value="">جميع المهندسين</option>' + 
+                Array.from(engineers).map(eng => `<option value="${eng}">${eng}</option>`).join('');
+            
+            select.value = currentValue;
+        }
+
+        function updateFilteredReports() {
+            updateEngineersReport();
+            updateWorkersPerformanceReport();
+            updateEquipmentPerformanceReport();
+        }
+
+        function updateWorkersPerformanceReport() {
+            const filterEngineer = document.getElementById('filter-engineer').value;
+            const filterNetwork = document.getElementById('filter-network').value;
+            const filterProject = document.getElementById('filter-project').value;
+            
+            const workerPerformance = {};
+            
+            workerRecords.forEach(record => {
+                if (filterEngineer && record.engineer !== filterEngineer) return;
+                if (filterNetwork && record.network !== filterNetwork) return;
+                if (filterProject && record.project !== filterProject) return;
+                
+                const key = `${record.name}|${record.engineer}|${record.network}|${record.project}`;
+                if (!workerPerformance[key]) {
+                    workerPerformance[key] = {
+                        name: record.name,
+                        engineer: record.engineer,
+                        network: record.network,
+                        project: record.project,
+                        totalHours: 0,
+                        days: new Set()
+                    };
+                }
+                workerPerformance[key].totalHours += record.hours;
+                workerPerformance[key].days.add(record.date);
+            });
+            
+            const tbody = document.getElementById('workers-performance-tbody');
+            
+            if (Object.keys(workerPerformance).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">لا توجد بيانات لعرضها</td></tr>';
+                return;
+            }
+            
+            const performanceArray = Object.values(workerPerformance).map(worker => {
+                const avgHours = worker.totalHours / worker.days.size;
+                let efficiency = '';
+                let efficiencyClass = '';
+                
+                if (avgHours >= 8) {
+                    efficiency = 'ممتاز';
+                    efficiencyClass = 'status-active';
+                } else if (avgHours >= 6) {
+                    efficiency = 'جيد';
+                    efficiencyClass = 'status-active';
+                } else if (avgHours >= 4) {
+                    efficiency = 'متوسط';
+                    efficiencyClass = 'status-completed';
+                } else {
+                    efficiency = 'منخفض';
+                    efficiencyClass = 'status-completed';
+                }
+                
+                return {
+                    ...worker,
+                    avgHours,
+                    efficiency,
+                    efficiencyClass,
+                    daysCount: worker.days.size
+                };
+            }).sort((a, b) => b.totalHours - a.totalHours);
+            
+            tbody.innerHTML = performanceArray.map(worker => `
+                <tr>
+                    <td><span class="status-badge ${worker.efficiencyClass}">${worker.efficiency}</span></td>
+                    <td>${worker.avgHours.toFixed(1)}</td>
+                    <td style="font-weight: 600;">${worker.totalHours.toFixed(1)}</td>
+                    <td>${worker.network}</td>
+                    <td>${worker.project}</td>
+                    <td>${worker.engineer}</td>
+                    <td style="font-weight: 500;">${worker.name}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateEquipmentPerformanceReport() {
+            const filterEngineer = document.getElementById('filter-engineer').value;
+            const filterNetwork = document.getElementById('filter-network').value;
+            const filterProject = document.getElementById('filter-project').value;
+            
+            const equipmentPerformance = {};
+            
+            equipmentRecords.forEach(record => {
+                if (filterEngineer && record.engineer !== filterEngineer) return;
+                if (filterNetwork && record.network !== filterNetwork) return;
+                if (filterProject && record.project !== filterProject) return;
+                
+                const key = `${record.name}|${record.engineer}|${record.network}|${record.project}`;
+                if (!equipmentPerformance[key]) {
+                    equipmentPerformance[key] = {
+                        name: record.name,
+                        engineer: record.engineer,
+                        network: record.network,
+                        project: record.project,
+                        totalHours: 0,
+                        days: new Set()
+                    };
+                }
+                equipmentPerformance[key].totalHours += record.hours;
+                equipmentPerformance[key].days.add(record.date);
+            });
+            
+            const tbody = document.getElementById('equipment-performance-tbody');
+            
+            if (Object.keys(equipmentPerformance).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">لا توجد بيانات لعرضها</td></tr>';
+                return;
+            }
+            
+            const performanceArray = Object.values(equipmentPerformance).map(equipment => {
+                const avgHours = equipment.totalHours / equipment.days.size;
+                let efficiency = '';
+                let efficiencyClass = '';
+                
+                if (avgHours >= 8) {
+                    efficiency = 'ممتاز';
+                    efficiencyClass = 'status-active';
+                } else if (avgHours >= 6) {
+                    efficiency = 'جيد';
+                    efficiencyClass = 'status-active';
+                } else if (avgHours >= 4) {
+                    efficiency = 'متوسط';
+                    efficiencyClass = 'status-completed';
+                } else {
+                    efficiency = 'منخفض';
+                    efficiencyClass = 'status-completed';
+                }
+                
+                return {
+                    ...equipment,
+                    avgHours,
+                    efficiency,
+                    efficiencyClass,
+                    daysCount: equipment.days.size
+                };
+            }).sort((a, b) => b.totalHours - a.totalHours);
+            
+            tbody.innerHTML = performanceArray.map(equipment => `
+                <tr>
+                    <td><span class="status-badge ${equipment.efficiencyClass}">${equipment.efficiency}</span></td>
+                    <td>${equipment.avgHours.toFixed(1)}</td>
+                    <td style="font-weight: 600;">${equipment.totalHours.toFixed(1)}</td>
+                    <td>${equipment.network}</td>
+                    <td>${equipment.project}</td>
+                    <td>${equipment.engineer}</td>
+                    <td style="font-weight: 500;">${equipment.name}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateEngineersReport() {
+            const filterEngineer = document.getElementById('filter-engineer').value;
+            const filterNetwork = document.getElementById('filter-network').value;
+            const filterProject = document.getElementById('filter-project').value;
+            const engineerData = {};
+
+            workerRecords.forEach(record => {
+                if (filterEngineer && record.engineer !== filterEngineer) return;
+                if (filterNetwork && record.network !== filterNetwork) return;
+                if (filterProject && record.project !== filterProject) return;
+                
+                if (!engineerData[record.engineer]) {
+                    engineerData[record.engineer] = {
+                        workerCount: 0,
+                        workerCost: 0,
+                        equipmentCount: 0,
+                        equipmentCost: 0
+                    };
+                }
+                engineerData[record.engineer].workerCount++;
+                engineerData[record.engineer].workerCost += record.cost;
+            });
+
+            equipmentRecords.forEach(record => {
+                if (filterEngineer && record.engineer !== filterEngineer) return;
+                if (filterNetwork && record.network !== filterNetwork) return;
+                if (filterProject && record.project !== filterProject) return;
+                
+                if (!engineerData[record.engineer]) {
+                    engineerData[record.engineer] = {
+                        workerCount: 0,
+                        workerCost: 0,
+                        equipmentCount: 0,
+                        equipmentCost: 0
+                    };
+                }
+                engineerData[record.engineer].equipmentCount++;
+                engineerData[record.engineer].equipmentCost += record.totalCost;
+            });
+
+            const tbody = document.getElementById('engineers-report-tbody');
+            
+            if (Object.keys(engineerData).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">لا توجد بيانات لعرضها</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = Object.entries(engineerData).map(([engineer, data]) => {
+                const totalCost = data.workerCost + data.equipmentCost;
+                return `
+                    <tr>
+                        <td style="font-weight: 600;">${totalCost.toFixed(2)}</td>
+                        <td>${data.equipmentCost.toFixed(2)}</td>
+                        <td>${data.workerCost.toFixed(2)}</td>
+                        <td>${data.equipmentCount}</td>
+                        <td>${data.workerCount}</td>
+                        <td style="font-weight: 500;">${engineer}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateProjectsReport() {
+            const projectData = {};
+
+            workerRecords.forEach(record => {
+                if (!projectData[record.location]) {
+                    projectData[record.location] = {
+                        workerHours: 0,
+                        workerCost: 0,
+                        equipmentHours: 0,
+                        equipmentCost: 0
+                    };
+                }
+                projectData[record.location].workerHours += record.hours;
+                projectData[record.location].workerCost += record.cost;
+            });
+
+            equipmentRecords.forEach(record => {
+                if (!projectData[record.location]) {
+                    projectData[record.location] = {
+                        workerHours: 0,
+                        workerCost: 0,
+                        equipmentHours: 0,
+                        equipmentCost: 0
+                    };
+                }
+                projectData[record.location].equipmentHours += record.hours;
+                projectData[record.location].equipmentCost += record.totalCost;
+            });
+
+            const tbody = document.getElementById('projects-tbody');
+            
+            if (Object.keys(projectData).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">لا توجد بيانات لعرضها</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = Object.entries(projectData).map(([location, data]) => {
+                const totalCost = data.workerCost + data.equipmentCost;
+                return `
+                    <tr>
+                        <td style="font-weight: 600;">${totalCost.toFixed(2)}</td>
+                        <td>${data.equipmentCost.toFixed(2)}</td>
+                        <td>${data.workerCost.toFixed(2)}</td>
+                        <td>${data.equipmentHours.toFixed(1)}</td>
+                        <td>${data.workerHours.toFixed(1)}</td>
+                        <td style="font-weight: 500;">${location}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateAIInsights() {
+            const insights = [];
+
+            if (workerRecords.length > 0) {
+                const avgHours = workerRecords.reduce((sum, r) => sum + r.hours, 0) / workerRecords.length;
+                const overworkers = workerRecords.filter(r => r.hours > 10).length;
+                
+                if (avgHours > 8) {
+                    insights.push('📊 متوسط ساعات العمل أعلى من المعدل الطبيعي (8 ساعات). قد يؤثر ذلك على الإنتاجية.');
+                }
+                
+                if (overworkers > 0) {
+                    insights.push(`⚠️ يوجد ${overworkers} عامل تجاوز 10 ساعات عمل يومية. يُنصح بمراجعة جدول العمل.`);
+                }
+
+                const lowPaidWorkers = workerRecords.filter(r => r.rate > 0 && r.rate < 30).length;
+                if (lowPaidWorkers > 0) {
+                    insights.push(`💰 يوجد ${lowPaidWorkers} عامل بأجر أقل من 30 ريال/ساعة. تأكد من التوافق مع معايير السوق.`);
+                }
+            }
+
+            if (equipmentRecords.length > 0) {
+                const idleEquipment = equipmentRecords.filter(r => r.hours < 4).length;
+                const maintenanceEquipment = equipmentRecords.filter(r => r.status === 'صيانة' || r.status === 'عطل').length;
+                
+                if (idleEquipment > 0) {
+                    insights.push(`⏸️ يوجد ${idleEquipment} معدة تعمل أقل من 4 ساعات يومياً. فرصة لتحسين الاستخدام.`);
+                }
+                
+                if (maintenanceEquipment > 0) {
+                    insights.push(`🔧 يوجد ${maintenanceEquipment} معدة تحتاج صيانة أو بها عطل. خطط للصيانة الدورية.`);
+                }
+            }
+
+            if (insights.length === 0) {
+                insights.push('✅ جميع المؤشرات ضمن المعدلات الطبيعية. استمر في التتبع المنتظم.');
+            }
+
+            document.getElementById('ai-insights-content').innerHTML = insights.map(insight => 
+                `<div class="insight-item">${insight}</div>`
+            ).join('');
+        }
+
+        function updateRecommendations() {
+            const recommendations = [];
+
+            const totalWorkerCost = workerRecords.reduce((sum, r) => sum + r.cost, 0);
+            const totalEquipmentCost = equipmentRecords.reduce((sum, r) => sum + r.totalCost, 0);
+            const totalCost = totalWorkerCost + totalEquipmentCost;
+
+            if (totalWorkerCost > totalEquipmentCost * 2) {
+                recommendations.push('📌 تكلفة العمالة أعلى بكثير من تكلفة المعدات. قد تستفيد من الأتمتة أو زيادة استخدام المعدات.');
+            }
+
+            if (workerRecords.length > 0 && equipmentRecords.length > 0) {
+                const workerHours = workerRecords.reduce((sum, r) => sum + r.hours, 0);
+                const equipmentHours = equipmentRecords.reduce((sum, r) => sum + r.hours, 0);
+                const ratio = workerHours / equipmentHours;
+                
+                if (ratio > 3) {
+                    recommendations.push('📌 نسبة ساعات العمالة إلى المعدات مرتفعة. توفير معدات إضافية قد يزيد الإنتاجية.');
+                }
+            }
+
+            const projectsWithHighCost = {};
+            [...workerRecords, ...equipmentRecords].forEach(record => {
+                const cost = record.cost || record.totalCost || 0;
+                projectsWithHighCost[record.location] = (projectsWithHighCost[record.location] || 0) + cost;
+            });
+
+            const highestCostProject = Object.entries(projectsWithHighCost)
+                .sort((a, b) => b[1] - a[1])[0];
+
+            if (highestCostProject) {
+                recommendations.push(`📌 مشروع "${highestCostProject[0]}" يستهلك أعلى تكلفة (${highestCostProject[1].toFixed(2)} ريال). راجع كفاءة الموارد.`);
+            }
+
+            if (recommendations.length === 0) {
+                recommendations.push('✅ لا توجد توصيات في الوقت الحالي. جميع المؤشرات متوازنة.');
+            }
+
+            document.getElementById('recommendations').innerHTML = recommendations.map(rec => 
+                `<div class="insight-item">${rec}</div>`
+            ).join('');
+        }
+
+        function updateAdvancedStats() {
+            const totalWorkerHours = workerRecords.reduce((sum, r) => sum + r.hours, 0);
+            const avgWorkerHours = workerRecords.length > 0 ? totalWorkerHours / workerRecords.length : 0;
+
+            const totalEquipmentHours = equipmentRecords.reduce((sum, r) => sum + r.hours, 0);
+            const maxPossibleHours = equipmentRecords.length * 24;
+            const utilizationRate = maxPossibleHours > 0 ? (totalEquipmentHours / maxPossibleHours) * 100 : 0;
+
+            const totalWorkerCost = workerRecords.reduce((sum, r) => sum + r.cost, 0);
+            const totalEquipmentCost = equipmentRecords.reduce((sum, r) => sum + r.totalCost, 0);
+            const totalProjectCost = totalWorkerCost + totalEquipmentCost;
+
+            document.getElementById('avg-worker-hours').textContent = avgWorkerHours.toFixed(1);
+            document.getElementById('avg-equipment-utilization').textContent = utilizationRate.toFixed(1) + '%';
+            document.getElementById('total-project-cost').textContent = totalProjectCost.toFixed(2);
+        }
+
+        setDefaultDate();
+        updateWorkerNameDropdown();
+        updateEquipmentNameDropdown();
+        updateEngineersDropdowns();
+    </script>
+</body>
+</html>
+
